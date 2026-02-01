@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <title>MTA Train Times - Prospect Park</title>
+  <title>Prospect Park</title>
   <style>
     * {
       margin: 0;
@@ -16,7 +16,7 @@
     body {
       min-height: 100vh;
       background-color: #fafafa;
-      padding: 32px;
+      padding: 3vh 3vw;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       align-items: center;
@@ -25,229 +25,170 @@
 
     .card {
       width: 100%;
-      max-width: 500px;
+      height: 100%;
       background-color: #fff;
-      border-radius: 24px;
-      padding: 32px 48px;
+      border-radius: 2vw;
+      padding: 3vh 4vw;
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
-    .section {
-      display: none;
-    }
-
-    .section.visible {
-      display: block;
-    }
-
-    .section-header {
-      font-size: 20px;
-      font-weight: 600;
-      color: #888;
-      text-transform: uppercase;
-      letter-spacing: 3px;
-      padding: 16px 0 12px 0;
-    }
-
-    .divider {
-      height: 2px;
-      background-color: #e5e5e5;
-      margin: 8px 0;
-      display: none;
-    }
-
-    .divider.visible {
-      display: block;
-    }
-
-    .train-row {
+    .row {
       display: none;
       align-items: center;
-      gap: 20px;
-      padding: 14px 0;
+      padding: 2vh 0;
+      border-bottom: 2px solid #eee;
     }
 
-    .train-row.visible {
+    .row:last-of-type {
+      border-bottom: none;
+    }
+
+    .row.visible {
       display: flex;
     }
 
-    .line-circle {
-      width: 64px;
-      height: 64px;
+    .direction {
+      font-size: 2vw;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.2vw;
+      width: 15vw;
+      margin-right: 4vw;
+      flex-shrink: 0;
+    }
+
+    .arrivals {
+      display: flex;
+      align-items: center;
+      flex: 1;
+    }
+
+    .arrival {
+      display: flex;
+      align-items: center;
+      gap: 1.5vw;
+      width: 22vw;
+    }
+
+    .line-badge {
+      width: 6vw;
+      height: 6vw;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 32px;
+      font-size: 3.5vw;
       font-weight: bold;
       color: #fff;
       flex-shrink: 0;
     }
 
-    .line-circle.B { background-color: #FF6319; }
-    .line-circle.Q { background-color: #FCCC0A; color: #000; }
-    .line-circle.S { background-color: #808183; }
+    .line-badge.B { background-color: #FF6319; }
+    .line-badge.Q { background-color: #FCCC0A; color: #000; }
+    .line-badge.S { background-color: #808183; }
 
-    .times {
-      display: flex;
-      align-items: baseline;
-      gap: 24px;
-      font-size: 32px;
-      font-weight: 500;
-      color: #333;
-    }
-
-    .time-item {
-      min-width: 50px;
-    }
-
-    .time-unit {
-      color: #888;
-      font-weight: 400;
-      font-size: 20px;
+    .time {
+      font-size: 7vw;
+      font-weight: 600;
+      color: #222;
     }
 
     .updated {
-      margin-top: 32px;
+      margin-top: 2vh;
       text-align: center;
-      font-size: 14px;
-      color: #aaa;
-      letter-spacing: 1px;
+      font-size: 1.5vw;
+      color: #999;
     }
 
     .loading {
       text-align: center;
-      padding: 40px;
+      padding: 10vh;
       color: #888;
-      font-size: 18px;
+      font-size: 3vw;
     }
 
     .error {
       text-align: center;
-      padding: 20px;
+      padding: 5vh;
       color: #c00;
-      font-size: 14px;
+      font-size: 2vw;
     }
   </style>
 </head>
 <body>
   <div class="card">
-    <div id="loading" class="loading">Loading train times...</div>
+    <div id="loading" class="loading">Loading...</div>
 
     <div id="content" style="display: none;">
-      <!-- Manhattan Section -->
-      <div class="section" id="section-manhattan">
-        <div class="section-header">Manhattan</div>
-        <div class="train-row" id="row-manhattan-b">
-          <div class="line-circle B">B</div>
-          <div class="times" id="times-manhattan-b"></div>
-        </div>
-        <div class="train-row" id="row-manhattan-q">
-          <div class="line-circle Q">Q</div>
-          <div class="times" id="times-manhattan-q"></div>
-        </div>
+      <div class="row" id="row-manhattan">
+        <div class="direction">Manhattan</div>
+        <div class="arrivals" id="arrivals-manhattan"></div>
       </div>
 
-      <div class="divider" id="divider-manhattan"></div>
-
-      <!-- Brooklyn Section -->
-      <div class="section" id="section-brooklyn">
-        <div class="section-header">Brooklyn</div>
-        <div class="train-row" id="row-brooklyn-b">
-          <div class="line-circle B">B</div>
-          <div class="times" id="times-brooklyn-b"></div>
-        </div>
-        <div class="train-row" id="row-brooklyn-q">
-          <div class="line-circle Q">Q</div>
-          <div class="times" id="times-brooklyn-q"></div>
-        </div>
+      <div class="row" id="row-brooklyn">
+        <div class="direction">Brooklyn</div>
+        <div class="arrivals" id="arrivals-brooklyn"></div>
       </div>
 
-      <div class="divider" id="divider-brooklyn"></div>
-
-      <!-- Franklin Ave Section -->
-      <div class="section" id="section-franklin">
-        <div class="section-header">Franklin Ave</div>
-        <div class="train-row" id="row-franklin-s">
-          <div class="line-circle S">S</div>
-          <div class="times" id="times-franklin-s"></div>
-        </div>
+      <div class="row" id="row-franklin">
+        <div class="direction">Franklin Ave</div>
+        <div class="arrivals" id="arrivals-franklin"></div>
       </div>
 
-      <!-- Last Updated -->
       <div class="updated" id="updated"></div>
     </div>
   </div>
 
-  <!-- Load protobuf.js from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.2.5/dist/protobuf.min.js"></script>
 
   <script>
-    // ============================================
-    // CONFIGURATION
-    // ============================================
-
-    // Prospect Park station stop IDs (D26 is shared by B, Q, and Franklin Shuttle)
     const STOP_IDS = {
-      NORTHBOUND: 'D26N',  // Manhattan-bound (B, Q) and Franklin Ave-bound (S)
-      SOUTHBOUND: 'D26S'   // Brooklyn/Coney Island-bound (B, Q)
+      NORTHBOUND: 'D26N',
+      SOUTHBOUND: 'D26S'
     };
 
-    // MTA Feed URLs (no API key required)
     const FEED_URLS = {
       BDFM: 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm',
       NQRW: 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-nqrw'
     };
 
-    // How often to refresh (milliseconds)
     const REFRESH_INTERVAL = 30000;
-
-    // ============================================
-    // GTFS-RT PROTOBUF SCHEMA
-    // ============================================
 
     const GTFS_RT_PROTO = `
       syntax = "proto2";
       package transit_realtime;
-
       message FeedMessage {
         required FeedHeader header = 1;
         repeated FeedEntity entity = 2;
       }
-
       message FeedHeader {
         required string gtfs_realtime_version = 1;
         optional uint64 timestamp = 2;
       }
-
       message FeedEntity {
         required string id = 1;
         optional TripUpdate trip_update = 3;
       }
-
       message TripUpdate {
         optional TripDescriptor trip = 1;
         repeated StopTimeUpdate stop_time_update = 2;
       }
-
       message TripDescriptor {
         optional string trip_id = 1;
         optional string route_id = 5;
       }
-
       message StopTimeUpdate {
         optional string stop_id = 4;
         optional StopTimeEvent arrival = 2;
       }
-
       message StopTimeEvent {
         optional int64 time = 2;
       }
     `;
-
-    // ============================================
-    // MAIN APP
-    // ============================================
 
     let FeedMessage = null;
 
@@ -255,11 +196,8 @@
       try {
         const root = protobuf.parse(GTFS_RT_PROTO).root;
         FeedMessage = root.lookupType('transit_realtime.FeedMessage');
-
         await updateDisplay();
         setInterval(updateDisplay, REFRESH_INTERVAL);
-
-        // Refresh when page becomes visible (iPad wake)
         document.addEventListener('visibilitychange', () => {
           if (document.visibilityState === 'visible') updateDisplay();
         });
@@ -278,115 +216,77 @@
     function getArrivalsFromFeed(feed, stopId, routeFilter) {
       const now = Date.now();
       const arrivals = [];
-
       for (const entity of feed.entity) {
         if (!entity.tripUpdate) continue;
-
         const routeId = entity.tripUpdate.trip?.routeId;
         if (!routeFilter.includes(routeId)) continue;
-
         for (const stu of entity.tripUpdate.stopTimeUpdate || []) {
           if (stu.stopId !== stopId) continue;
-
           const arrivalTime = stu.arrival?.time;
           if (!arrivalTime) continue;
-
           const arrivalMs = Number(arrivalTime) * 1000;
           const minutes = Math.floor((arrivalMs - now) / 60000);
-
           if (minutes >= 0 && minutes < 90) {
             arrivals.push({ route: routeId === 'FS' ? 'S' : routeId, minutes });
           }
         }
       }
-
       return arrivals;
     }
 
     async function updateDisplay() {
       try {
-        // Fetch both feeds in parallel
         const [bdfmFeed, nqrwFeed] = await Promise.all([
           fetchFeed(FEED_URLS.BDFM),
           fetchFeed(FEED_URLS.NQRW)
         ]);
 
-        // Get arrivals from BDFM (B and Franklin Shuttle)
         const bdfmNorth = getArrivalsFromFeed(bdfmFeed, STOP_IDS.NORTHBOUND, ['B', 'FS']);
         const bdfmSouth = getArrivalsFromFeed(bdfmFeed, STOP_IDS.SOUTHBOUND, ['B', 'FS']);
-
-        // Get arrivals from NQRW (Q)
         const nqrwNorth = getArrivalsFromFeed(nqrwFeed, STOP_IDS.NORTHBOUND, ['Q']);
         const nqrwSouth = getArrivalsFromFeed(nqrwFeed, STOP_IDS.SOUTHBOUND, ['Q']);
 
-        // Combine and sort
-        const northbound = [...bdfmNorth, ...nqrwNorth].sort((a, b) => a.minutes - b.minutes);
-        const southbound = [...bdfmSouth, ...nqrwSouth].sort((a, b) => a.minutes - b.minutes);
+        // Combine all arrivals per direction, sorted by time
+        const manhattan = [...bdfmNorth.filter(a => a.route === 'B'), ...nqrwNorth]
+          .sort((a, b) => a.minutes - b.minutes).slice(0, 3);
+        const brooklyn = [...bdfmSouth.filter(a => a.route === 'B'), ...nqrwSouth]
+          .sort((a, b) => a.minutes - b.minutes).slice(0, 3);
+        const franklin = bdfmNorth.filter(a => a.route === 'S')
+          .sort((a, b) => a.minutes - b.minutes).slice(0, 3);
 
-        // Group by route and direction
-        const data = {
-          manhattan: {
-            B: northbound.filter(a => a.route === 'B').map(a => a.minutes).slice(0, 3),
-            Q: northbound.filter(a => a.route === 'Q').map(a => a.minutes).slice(0, 3)
-          },
-          brooklyn: {
-            B: southbound.filter(a => a.route === 'B').map(a => a.minutes).slice(0, 3),
-            Q: southbound.filter(a => a.route === 'Q').map(a => a.minutes).slice(0, 3)
-          },
-          franklin: {
-            S: northbound.filter(a => a.route === 'S').map(a => a.minutes).slice(0, 3)
-          }
-        };
-
-        renderDisplay(data);
+        renderDisplay({ manhattan, brooklyn, franklin });
       } catch (err) {
         console.error('Error fetching feed:', err);
         showError('Failed to fetch train times. Retrying...');
       }
     }
 
-    function renderTimes(elementId, times) {
-      const container = document.getElementById(elementId);
-      const row = document.getElementById(elementId.replace('times-', 'row-'));
+    function renderRow(rowId, arrivalsId, arrivals) {
+      const row = document.getElementById(rowId);
+      const container = document.getElementById(arrivalsId);
 
-      if (!times || times.length === 0) {
+      if (!arrivals || arrivals.length === 0) {
         row.classList.remove('visible');
-        return false;
+        return;
       }
 
       row.classList.add('visible');
-      container.innerHTML = times
-        .map(t => `<span class="time-item">${t} <span class="time-unit">min</span></span>`)
-        .join('');
-      return true;
+      container.innerHTML = arrivals.map(a => `
+        <div class="arrival">
+          <div class="line-badge ${a.route}">${a.route}</div>
+          <div class="time">${a.minutes}</div>
+        </div>
+      `).join('');
     }
 
     function renderDisplay(data) {
-      // Hide loading, show content
       document.getElementById('loading').style.display = 'none';
       document.getElementById('content').style.display = 'block';
 
-      // Render each row and track visibility
-      const manhattanB = renderTimes('times-manhattan-b', data.manhattan.B);
-      const manhattanQ = renderTimes('times-manhattan-q', data.manhattan.Q);
-      const brooklynB = renderTimes('times-brooklyn-b', data.brooklyn.B);
-      const brooklynQ = renderTimes('times-brooklyn-q', data.brooklyn.Q);
-      const franklinS = renderTimes('times-franklin-s', data.franklin.S);
+      renderRow('row-manhattan', 'arrivals-manhattan', data.manhattan);
+      renderRow('row-brooklyn', 'arrivals-brooklyn', data.brooklyn);
+      renderRow('row-franklin', 'arrivals-franklin', data.franklin);
 
-      // Show/hide sections based on whether they have any visible rows
-      const manhattanVisible = manhattanB || manhattanQ;
-      const brooklynVisible = brooklynB || brooklynQ;
-      const franklinVisible = franklinS;
-
-      document.getElementById('section-manhattan').classList.toggle('visible', manhattanVisible);
-      document.getElementById('section-brooklyn').classList.toggle('visible', brooklynVisible);
-      document.getElementById('section-franklin').classList.toggle('visible', franklinVisible);
-
-      // Show dividers between visible sections
-      document.getElementById('divider-manhattan').classList.toggle('visible', manhattanVisible && (brooklynVisible || franklinVisible));
-      document.getElementById('divider-brooklyn').classList.toggle('visible', brooklynVisible && franklinVisible);
-
-      // Update timestamp
       document.getElementById('updated').textContent =
         `Updated ${new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}`;
     }
@@ -394,16 +294,13 @@
     function showError(message) {
       const loading = document.getElementById('loading');
       const content = document.getElementById('content');
-
       if (content.style.display === 'block') {
-        // Already showing data, just log error
         console.error(message);
       } else {
         loading.innerHTML = `<div class="error">${message}</div>`;
       }
     }
 
-    // Start the app
     init();
   </script>
 </body>
