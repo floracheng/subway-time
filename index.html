@@ -39,6 +39,17 @@
       justify-content: center;
     }
 
+    .title {
+      font-size: 2vw;
+      font-weight: 500;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.3vw;
+      padding-bottom: 2vh;
+      margin-bottom: 2vh;
+      border-bottom: 1px solid #eee;
+    }
+
     .row {
       display: none;
       align-items: center;
@@ -126,6 +137,8 @@
 <body>
   <div class="card">
     <div id="loading" class="loading">Loading...</div>
+
+    <h1 class="title">Prospect Park</h1>
 
     <div id="content" style="display: none;">
       <div class="row" id="row-manhattan">
@@ -307,5 +320,8 @@
 
     init();
   </script>
+
+  <script data-goatcounter="https://floracheng.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>
