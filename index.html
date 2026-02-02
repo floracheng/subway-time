@@ -132,6 +132,71 @@
       color: #c00;
       font-size: 2vw;
     }
+
+    /* Portrait mode for phones */
+    @media (max-width: 500px) and (orientation: portrait) {
+      body {
+        padding: 3vh 4vw;
+      }
+
+      .card {
+        padding: 4vh 5vw;
+      }
+
+      .title {
+        font-size: 5vw;
+        letter-spacing: 0.5vw;
+        padding-bottom: 2vh;
+        margin-bottom: 3vh;
+      }
+
+      .row {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 3vh 0;
+      }
+
+      .direction {
+        font-size: 5vw;
+        width: auto;
+        margin-right: 0;
+        margin-bottom: 2vh;
+      }
+
+      .arrivals {
+        width: 100%;
+        justify-content: flex-start;
+        gap: 5vw;
+      }
+
+      .arrival {
+        width: auto;
+        gap: 2vw;
+      }
+
+      .line-badge {
+        width: 10vw;
+        height: 10vw;
+        font-size: 6vw;
+      }
+
+      .time {
+        font-size: 11vw;
+      }
+
+      .updated {
+        font-size: 4vw;
+        margin-top: 3vh;
+      }
+
+      .loading {
+        font-size: 6vw;
+      }
+
+      .error {
+        font-size: 5vw;
+      }
+    }
   </style>
 </head>
 <body>
