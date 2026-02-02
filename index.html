@@ -135,8 +135,13 @@
 
     /* Portrait mode for phones */
     @media (max-width: 500px) and (orientation: portrait) {
+      html, body {
+        overflow: hidden;
+        height: 100vh;
+      }
+
       body {
-        padding: 3vh 4vw;
+        padding: 3vh 4vw 12vh;
       }
 
       .card {
