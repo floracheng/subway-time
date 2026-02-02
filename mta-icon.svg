@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180">
+  <!-- Background -->
+  <rect width="180" height="180" rx="36" fill="#1a1a1a"/>
+  
+  <!-- B Circle (orange) -->
+  <circle cx="38" cy="90" r="28" fill="#FF6319"/>
+  <text x="38" y="101" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="34" font-weight="bold" fill="white">B</text>
+  
+  <!-- Q Circle (yellow) -->
+  <circle cx="90" cy="90" r="28" fill="#FCCC0A"/>
+  <text x="90" y="101" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="34" font-weight="bold" fill="#1a1a1a">Q</text>
+  
+  <!-- S Circle (gray) -->
+  <circle cx="142" cy="90" r="28" fill="#808183"/>
+  <text x="142" y="101" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, Arial, sans-serif" font-size="34" font-weight="bold" fill="white">S</text>
+</svg>
