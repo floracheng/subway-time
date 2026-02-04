@@ -252,28 +252,38 @@
     }
 
     // Parse station from URL param, default to Prospect Park (D26)
-    function getStopIds() {
+    function parseStationParam() {
       const params = new URLSearchParams(window.location.search);
       const station = params.get('station');
 
       if (!station) {
-        return { NORTHBOUND: 'D26N', SOUTHBOUND: 'D26S' };
+        return {
+          stopIds: { NORTHBOUND: 'D26N', SOUTHBOUND: 'D26S' },
+          lines: null  // Default: use hardcoded line filters
+        };
       }
+
+      // Split station:lines format (e.g., "D27:B;Q" or "D27N:B;Q")
+      const [stationId, linesStr] = station.split(':');
+      const lines = linesStr ? linesStr.split(';').map(l => l.trim().toUpperCase()) : null;
 
       // Check if station already has direction suffix
-      const lastChar = station.slice(-1).toUpperCase();
+      const lastChar = stationId.slice(-1).toUpperCase();
+      let stopIds;
       if (lastChar === 'N') {
-        return { NORTHBOUND: station.toUpperCase(), SOUTHBOUND: null };
+        stopIds = { NORTHBOUND: stationId.toUpperCase(), SOUTHBOUND: null };
       } else if (lastChar === 'S') {
-        return { NORTHBOUND: null, SOUTHBOUND: station.toUpperCase() };
+        stopIds = { NORTHBOUND: null, SOUTHBOUND: stationId.toUpperCase() };
       } else {
         // No direction suffix - use both
-        const base = station.toUpperCase();
-        return { NORTHBOUND: base + 'N', SOUTHBOUND: base + 'S' };
+        const base = stationId.toUpperCase();
+        stopIds = { NORTHBOUND: base + 'N', SOUTHBOUND: base + 'S' };
       }
+
+      return { stopIds, lines };
     }
 
-    const STOP_IDS = getStopIds();
+    const { stopIds: STOP_IDS, lines: LINE_FILTER } = parseStationParam();
 
     // Update page title and header with station name
     const baseId = getStopBase(STOP_IDS.NORTHBOUND || STOP_IDS.SOUTHBOUND);
@@ -372,17 +382,23 @@
           fetchFeed(FEED_URLS.NQRW)
         ]);
 
-        const bdfmNorth = STOP_IDS.NORTHBOUND ? getArrivalsFromFeed(bdfmFeed, STOP_IDS.NORTHBOUND, ['B', 'FS']) : [];
-        const bdfmSouth = STOP_IDS.SOUTHBOUND ? getArrivalsFromFeed(bdfmFeed, STOP_IDS.SOUTHBOUND, ['B', 'FS']) : [];
-        const nqrwNorth = STOP_IDS.NORTHBOUND ? getArrivalsFromFeed(nqrwFeed, STOP_IDS.NORTHBOUND, ['Q']) : [];
-        const nqrwSouth = STOP_IDS.SOUTHBOUND ? getArrivalsFromFeed(nqrwFeed, STOP_IDS.SOUTHBOUND, ['Q']) : [];
+        // Determine which routes to query (default to Prospect Park's B, Q, S)
+        const routeFilter = LINE_FILTER || ['B', 'Q', 'FS'];
+
+        const bdfmNorth = STOP_IDS.NORTHBOUND ? getArrivalsFromFeed(bdfmFeed, STOP_IDS.NORTHBOUND, routeFilter) : [];
+        const bdfmSouth = STOP_IDS.SOUTHBOUND ? getArrivalsFromFeed(bdfmFeed, STOP_IDS.SOUTHBOUND, routeFilter) : [];
+        const nqrwNorth = STOP_IDS.NORTHBOUND ? getArrivalsFromFeed(nqrwFeed, STOP_IDS.NORTHBOUND, routeFilter) : [];
+        const nqrwSouth = STOP_IDS.SOUTHBOUND ? getArrivalsFromFeed(nqrwFeed, STOP_IDS.SOUTHBOUND, routeFilter) : [];
 
         // Combine all arrivals per direction, sorted by time
-        const manhattan = [...bdfmNorth.filter(a => a.route === 'B'), ...nqrwNorth]
+        const manhattan = [...bdfmNorth, ...nqrwNorth]
+          .filter(a => a.route !== 'S')
           .sort((a, b) => a.minutes - b.minutes).slice(0, 3);
-        const brooklyn = [...bdfmSouth.filter(a => a.route === 'B'), ...nqrwSouth]
+        const brooklyn = [...bdfmSouth, ...nqrwSouth]
+          .filter(a => a.route !== 'S')
           .sort((a, b) => a.minutes - b.minutes).slice(0, 3);
-        const franklin = bdfmNorth.filter(a => a.route === 'S')
+        const franklin = [...bdfmNorth, ...nqrwNorth]
+          .filter(a => a.route === 'S')
           .sort((a, b) => a.minutes - b.minutes).slice(0, 3);
 
         renderDisplay({ manhattan, brooklyn, franklin });
