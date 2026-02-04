@@ -238,12 +238,49 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/protobufjs@7.2.5/dist/protobuf.min.js"></script>
+  <script src="./stops.js"></script>
 
   <script>
-    const STOP_IDS = {
-      NORTHBOUND: 'D26N',
-      SOUTHBOUND: 'D26S'
-    };
+    // Extract base station ID without N/S suffix
+    function getStopBase(stopId) {
+      if (!stopId) return null;
+      const lastChar = stopId.slice(-1).toUpperCase();
+      if (lastChar === 'N' || lastChar === 'S') {
+        return stopId.slice(0, -1);
+      }
+      return stopId;
+    }
+
+    // Parse station from URL param, default to Prospect Park (D26)
+    function getStopIds() {
+      const params = new URLSearchParams(window.location.search);
+      const station = params.get('station');
+
+      if (!station) {
+        return { NORTHBOUND: 'D26N', SOUTHBOUND: 'D26S' };
+      }
+
+      // Check if station already has direction suffix
+      const lastChar = station.slice(-1).toUpperCase();
+      if (lastChar === 'N') {
+        return { NORTHBOUND: station.toUpperCase(), SOUTHBOUND: null };
+      } else if (lastChar === 'S') {
+        return { NORTHBOUND: null, SOUTHBOUND: station.toUpperCase() };
+      } else {
+        // No direction suffix - use both
+        const base = station.toUpperCase();
+        return { NORTHBOUND: base + 'N', SOUTHBOUND: base + 'S' };
+      }
+    }
+
+    const STOP_IDS = getStopIds();
+
+    // Update page title and header with station name
+    const baseId = getStopBase(STOP_IDS.NORTHBOUND || STOP_IDS.SOUTHBOUND);
+    const stationName = window.stops?.[baseId] || 'Subway';
+    document.title = stationName;
+    document.querySelector('.title').textContent = stationName;
+    document.querySelector('meta[property="og:title"]').content = stationName + ' Subway';
 
     const FEED_URLS = {
       BDFM: 'https://api-endpoint.mta.info/Dataservice/mtagtfsfeeds/nyct%2Fgtfs-bdfm',
@@ -335,10 +372,10 @@
           fetchFeed(FEED_URLS.NQRW)
         ]);
 
-        const bdfmNorth = getArrivalsFromFeed(bdfmFeed, STOP_IDS.NORTHBOUND, ['B', 'FS']);
-        const bdfmSouth = getArrivalsFromFeed(bdfmFeed, STOP_IDS.SOUTHBOUND, ['B', 'FS']);
-        const nqrwNorth = getArrivalsFromFeed(nqrwFeed, STOP_IDS.NORTHBOUND, ['Q']);
-        const nqrwSouth = getArrivalsFromFeed(nqrwFeed, STOP_IDS.SOUTHBOUND, ['Q']);
+        const bdfmNorth = STOP_IDS.NORTHBOUND ? getArrivalsFromFeed(bdfmFeed, STOP_IDS.NORTHBOUND, ['B', 'FS']) : [];
+        const bdfmSouth = STOP_IDS.SOUTHBOUND ? getArrivalsFromFeed(bdfmFeed, STOP_IDS.SOUTHBOUND, ['B', 'FS']) : [];
+        const nqrwNorth = STOP_IDS.NORTHBOUND ? getArrivalsFromFeed(nqrwFeed, STOP_IDS.NORTHBOUND, ['Q']) : [];
+        const nqrwSouth = STOP_IDS.SOUTHBOUND ? getArrivalsFromFeed(nqrwFeed, STOP_IDS.SOUTHBOUND, ['Q']) : [];
 
         // Combine all arrivals per direction, sorted by time
         const manhattan = [...bdfmNorth.filter(a => a.route === 'B'), ...nqrwNorth]
